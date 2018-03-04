@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Gltf - skin test</title>
+    <meta charset="utf-8">
+</head>
+<style>
+    body {
+        background-color: #222222;
+        margin: 0;
+        overflow: hidden;
+        color: white;
+    }
+
+    .button{
+        background-color: darkred;
+        cursor: pointer;
+        left: 0;
+        padding: 25px;
+        position: absolute;
+        top: 0;
+    }
+
+    #button-02{
+        left: 150px;
+    }
+
+</style>
+<body>
+
+<div id="container"></div>
+<div class="button" id="button-01">Animation 1</div>
+<div class="button" id="button-02">Animation 2</div>
+
+<div id="info">
+    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
+</div>
+
+<script src="/gltf-skin/assets/js/three.min.js"></script>
+<script src="/gltf-skin/assets/js/controls/OrbitControls.js"></script>
+<script src="/gltf-skin/assets/js/loaders/GLTFLoader.js"></script>
+
+<script>
+
+    var container;
+
+    var camera, scene, renderer;
+
+    var mesh ,mixer;
+
+    var animations;
+
+    var clock = new THREE.Clock();
+
+    var button01 = document.getElementById('button-01');
+    var button02 = document.getElementById('button-02');
+
+    var button01clicked = false;
+    var button02clicked = false;
+
+    init();
+
+    animate();
+
+    function init() {
+
+        container = document.getElementById( 'container' );
+
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight,  1, 10000 );
+        camera.position.set( 0, 0, 5 );
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0x222222 );
+        scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+
+        var light = new THREE.PointLight( "white", 0.7 );
+        light.position.set( 100, 100, 100 );
+        scene.add( light );
+
+        light = new THREE.PointLight( "white", 0.7 );
+        light.position.set( -100, -100, -100 );
+        scene.add( light );
+
+        light = new THREE.AmbientLight( 0x111111 );
+        scene.add( light );
+
+        var loader = new THREE.GLTFLoader();
+        loader.load( '/gltf-skin/assets/models/CesiumMan.gltf', function ( gltf ) {
+
+            var object = gltf.scene;
+            animations = gltf.animations;
+
+            mixer = new THREE.AnimationMixer( object );
+
+            scene.add( object );
+
+         } );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+        //
+
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        //
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        // Clicks
+
+        button01.onclick = function () {
+
+            if ( button02clicked ){
+
+                button02clicked = false;
+
+            }
+
+            button01clicked = true;
+
+        };
+
+        button02.onclick = function () {
+
+            if ( button01clicked ){
+
+                button01clicked = false;
+
+            }
+
+            button02clicked = true;
+
+        };
+
+    }
+    
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+    }
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+        render();
+
+
+    }
+
+    function render() {
+
+        renderer.render( scene, camera );
+
+        if( button01clicked ){
+
+            if (mixer) {
+                mixer.clipAction(animations[1]).play();
+                mixer.clipAction(animations[2]).stop();
+            }
+
+        }
+
+        if( button02clicked ){
+            if (mixer) {
+                mixer.clipAction(animations[2]).play();
+                mixer.clipAction(animations[1]).stop();
+            }
+        }
+        if (mixer) mixer.update(clock.getDelta())
+
+    }
+</script>
+
+</body>
+</html>
