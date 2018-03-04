@@ -161,18 +161,21 @@
         if( button01clicked ){
 
             if (mixer) {
-                mixer.clipAction(animations[1]).play();
-                mixer.clipAction(animations[2]).stop();
+                mixer.clipAction(animations[3]).play();
+                mixer.clipAction(animations[1]).stop();
             }
 
         }
 
         if( button02clicked ){
+
             if (mixer) {
-                mixer.clipAction(animations[2]).play();
-                mixer.clipAction(animations[1]).stop();
+                mixer.clipAction(animations[1]).play();
+                mixer.clipAction(animations[3]).stop();
             }
+
         }
+
         if (mixer) mixer.update(clock.getDelta())
 
     }
